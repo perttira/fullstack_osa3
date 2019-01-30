@@ -1,0 +1,7 @@
+POST http://localhost:3001/notes/
+content-Type: application/json
+
+{
+	"content": "Postman toimii kuin junan vessa",
+	"important": true
+}
