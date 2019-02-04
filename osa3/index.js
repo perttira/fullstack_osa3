@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 
 // 3.1 puhelinluettelon backend osa 1 && 3.2 puhelinluettelon backend osa 2
 // && 3.3 puhelinluettelon backend osa 3 && 3.4 puhelinluettelon backend osa 4
+// && 3.5 puhelinluettelon backend osa 5
 
 app.use(bodyParser.json())
 
@@ -25,24 +26,31 @@ let notes = [
       id: 3
     }
   ]
-  
+
+  /*   */
+  const generateId = () => {
+    //selvitetään olemassaolevista id:istä suurin muuttujaan maxId.
+    // Uuden muistiinpanon id:ksi asetetaan sitten maxId+1.
+    //const maxId = notes.length > 0 ? notes.map(n => n.id).sort((a,b) => a - b).reverse()[0] : 1
+    //return maxId + 1
+    return Math.floor(Math.random() * Math.floor(1000000000000000000000));
+  }
+
+
+  /*   */
   app.get('/api/notes/:id', (request, response) => {
     const id = Number(request.params.id)
-    console.log(id)
     const note = notes.find(note => note.id === id)
-    console.log(note)
 
-    console.log("kissa")
-
-    
     if ( note ) {
       response.json(note)
     } else {
       response.status(404).end()
     }
   })
-  
 
+  
+  /*   */
   app.delete('/api/notes/:id', (request, response) => {
     const id = Number(request.params.id)
     
@@ -54,13 +62,16 @@ let notes = [
       response.status(404).end()
     }
   })
-  
+
+
+  /*  */
   app.get('/api/notes', (req, res) => {
     console.log('notes.length', notes.length);
-
     res.json(notes)
   })
 
+
+  /*   */
   app.get('/info', (req, res) => {
     console.log('notes.length', notes.length);
     //res.json(notes)
@@ -68,16 +79,10 @@ let notes = [
     res.write("<div>Puhelinluettelossa "+notes.length +" henkilon tiedot</div>")
     res.write("<div>"+date+"</div>")
     res.end()
-
-
-
   })
 
-  const generateId = () => {
-    const maxId = notes.length > 0 ? notes.map(n => n.id).sort((a,b) => a - b).reverse()[0] : 1
-    return maxId + 1
-  }
   
+  /*   */
   app.post('/api/notes', (request, response) => {
     const body = request.body
   
@@ -86,17 +91,14 @@ let notes = [
     }
   
     const note = {
-      content: body.content,
-      important: body.important|| false,
-      date: new Date(),
+      name: body.content,
+      //important: body.important|| false,
+      //date: new Date(),
+      number: body.number,
       id: generateId()
     }
-
-    console.log('notes.length', notes.length);
-
   
     notes = notes.concat(note)
-  
     response.json(note)
   })
   
@@ -105,4 +107,3 @@ let notes = [
     console.log(`Server running on port ${PORT}`)
   })
 
-afadffadafdsaafds

@@ -2,6 +2,7 @@ POST http://localhost:3001/api/notes/
 content-Type: application/json
 
 {
-	"content": "Postman toimii kuin junan vessa",
-	"important": true
+	"content": "Mathi Floori",
+	"number": "050-456788888"
+	//"important": true
 }
