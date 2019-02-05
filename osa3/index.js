@@ -2,12 +2,25 @@ const http = require('http')
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const morgan = require('morgan')
 
 // 3.1 puhelinluettelon backend osa 1 && 3.2 puhelinluettelon backend osa 2
 // && 3.3 puhelinluettelon backend osa 3 && 3.4 puhelinluettelon backend osa 4
-// && 3.5 puhelinluettelon backend osa 5
+// && 3.5 puhelinluettelon backend osa 5 && 3.6 puhelinluettelon backend osa 6
+// && 3.7 puhelinluettelon backend osa 7
 
-app.use(bodyParser.json())
+const logger = (request, response, next) => {
+  console.log('Method:',request.method)
+  console.log('Path:  ', request.path)
+  console.log('Body:  ', request.body)
+  console.log('---')
+  next()
+}
+
+
+//morgan("default", tiny)
+
+app.use(bodyParser.json(), logger, morgan('tiny'))
 
 let notes = [
     {
@@ -113,6 +126,12 @@ let notes = [
     response.json(note)
   })
   
+  const error = (request, response) => {
+    response.status(404).send({error: 'unknown endpoint'})
+  }
+  
+  app.use(error)
+
   const PORT = 3001
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
