@@ -2,7 +2,7 @@ POST http://localhost:3001/api/notes/
 content-Type: application/json
 
 {
-	"content": "Mathi Floori",
-	"number": "050-456788888"
+	"content": "Kani Koni",
+	"number": "050-6667778"
 	//"important": true
 }

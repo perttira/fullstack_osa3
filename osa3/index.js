@@ -86,8 +86,19 @@ let notes = [
   app.post('/api/notes', (request, response) => {
     const body = request.body
   
-    if (body.content === undefined) {
-      return response.status(400).json({error: 'content missing'})
+    /*
+    var filteredNotes = notes.filter(function (note) {
+      console.log("note.number: ",note.number,"typeof note.number: ", typeof note.number,"body.number: ", body.number,"typeof body.number: ", typeof body.number, note.number === body.number)
+
+      note.number != body.number
+
+    })
+*/
+
+    if (body.number === "" || body.content === "" ) {
+      return response.status(400).json({error: 'Person name or number missing'})
+    } else if (notes.filter(note => note.name === body.content).length != 0) {
+      return response.status(400).json({error: 'Name must must unique'})
     }
   
     const note = {
