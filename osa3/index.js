@@ -17,10 +17,36 @@ const logger = (request, response, next) => {
   next()
 }
 
-
+//:method :url :status :res[content-length] - :response-time ms
+/*
+morgan.token('type', function (req, res) { return 
+  req.method, req.url, res.status :res[content-length] - :response-time ms
+  req.headers['content-type'] })
+*/
 //morgan("default", tiny)
 
-app.use(bodyParser.json(), logger, morgan('tiny'))
+//var kissa = morgan.token('kissa', function(req, res){return req.headers['content-type']})
+/*
+morgan.token('content', function getContent (req, res) {
+  var token_content = req.method + req.url + req.status + JSON.stringify(req.body)
+  return token_content
+})
+*/
+var custom_token = morgan(function (tokens, req, res) {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    JSON.stringify(req.body),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), '-',
+    tokens['response-time'](req, res), 'ms'
+  ].join(' ')
+})
+/*
+app.use(bodyParser.json(), logger, morgan(':method :url :status :res[content-length] - :response-time ms')
+)
+*/
+app.use(bodyParser.json(), logger, custom_token)
 
 let notes = [
     {
