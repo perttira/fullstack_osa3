@@ -3,11 +3,16 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
+const cors = require('cors')
 
-// 3.1 puhelinluettelon backend osa 1 && 3.2 puhelinluettelon backend osa 2
+app.use(cors())
+
+
+//    3.1 puhelinluettelon backend osa 1 && 3.2 puhelinluettelon backend osa 2
 // && 3.3 puhelinluettelon backend osa 3 && 3.4 puhelinluettelon backend osa 4
 // && 3.5 puhelinluettelon backend osa 5 && 3.6 puhelinluettelon backend osa 6
-// && 3.7 puhelinluettelon backend osa 7
+// && 3.7 puhelinluettelon backend osa 7 && 3.8* puhelinluettelon backend osa 8
+
 
 const logger = (request, response, next) => {
   console.log('Method:',request.method)
@@ -48,7 +53,7 @@ app.use(bodyParser.json(), logger, morgan(':method :url :status :res[content-len
 */
 app.use(bodyParser.json(), logger, custom_token)
 
-let notes = [
+let persons = [
     {
       name: 'Kimmo Koskenkorva',
       number: '050-6667778',
@@ -70,16 +75,16 @@ let notes = [
   const generateId = () => {
     //selvitetään olemassaolevista id:istä suurin muuttujaan maxId.
     // Uuden muistiinpanon id:ksi asetetaan sitten maxId+1.
-    //const maxId = notes.length > 0 ? notes.map(n => n.id).sort((a,b) => a - b).reverse()[0] : 1
+    //const maxId = persons.length > 0 ? persons.map(n => n.id).sort((a,b) => a - b).reverse()[0] : 1
     //return maxId + 1
     return Math.floor(Math.random() * Math.floor(1000000000000000000000));
   }
 
 
   /*   */
-  app.get('/api/notes/:id', (request, response) => {
+  app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    const note = notes.find(note => note.id === id)
+    const note = persons.find(note => note.id === id)
 
     if ( note ) {
       response.json(note)
@@ -90,12 +95,12 @@ let notes = [
 
   
   /*   */
-  app.delete('/api/notes/:id', (request, response) => {
+  app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     
     // id:tä ei löytynyt jos filter palauttaa tyhjän taulukon
-    if ( notes.filter(note => note.id === id).length != 0 ) {
-      notes = notes.filter(note => note.id !== id)
+    if ( persons.filter(note => note.id === id).length != 0 ) {
+      persons = persons.filter(note => note.id !== id)
       response.status(204).end()
     } else {
       response.status(404).end()
@@ -104,29 +109,29 @@ let notes = [
 
 
   /*  */
-  app.get('/api/notes', (req, res) => {
-    console.log('notes.length', notes.length);
-    res.json(notes)
+  app.get('/api/persons', (req, res) => {
+    console.log('persons.length', persons.length);
+    res.json(persons)
   })
 
 
   /*   */
   app.get('/info', (req, res) => {
-    console.log('notes.length', notes.length);
-    //res.json(notes)
+    console.log('persons.length', persons.length);
+    //res.json(persons)
     var date = new Date()
-    res.write("<div>Puhelinluettelossa "+notes.length +" henkilon tiedot</div>")
+    res.write("<div>Puhelinluettelossa "+persons.length +" henkilon tiedot</div>")
     res.write("<div>"+date+"</div>")
     res.end()
   })
 
   
   /*   */
-  app.post('/api/notes', (request, response) => {
+  app.post('/api/persons', (request, response) => {
     const body = request.body
   
     /*
-    var filteredNotes = notes.filter(function (note) {
+    var filteredpersons = persons.filter(function (note) {
       console.log("note.number: ",note.number,"typeof note.number: ", typeof note.number,"body.number: ", body.number,"typeof body.number: ", typeof body.number, note.number === body.number)
 
       note.number != body.number
@@ -136,7 +141,7 @@ let notes = [
 
     if (body.number === "" || body.content === "" ) {
       return response.status(400).json({error: 'Person name or number missing'})
-    } else if (notes.filter(note => note.name === body.content).length != 0) {
+    } else if (persons.filter(note => note.name === body.content).length != 0) {
       return response.status(400).json({error: 'Name must must unique'})
     }
   
@@ -148,7 +153,7 @@ let notes = [
       id: generateId()
     }
   
-    notes = notes.concat(note)
+    persons = persons.concat(note)
     response.json(note)
   })
   
@@ -156,10 +161,17 @@ let notes = [
     response.status(404).send({error: 'unknown endpoint'})
   }
   
+
   app.use(error)
 
+/*
   const PORT = 3001
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
+  })
+*/
+  const PORT = process.env.PORT || 3001
+  app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
   })
 
