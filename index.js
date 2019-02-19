@@ -6,6 +6,9 @@ const morgan = require('morgan')
 const cors = require('cors')
 
 app.use(cors())
+
+/* asetetaan backend käyttämään buildia. 
+Kommentoi pois jos haluat käyttää development versiota (esim osa2) */
 app.use(express.static('build'))
 
 
@@ -56,19 +59,24 @@ app.use(bodyParser.json(), logger, custom_token)
 
 let persons = [
     {
+      name: 'koira',
+      number: '222',
+      id: 1
+    },
+    {
       name: 'Kimmo Koskenkorva',
       number: '050-6667778',
-      id: 1
+      id: 2
     },
     {
       name: 'Mauri Muntteri',
       number: '040-4566543',
-      id: 2
+      id: 3
     },
     {
       name: 'Liisa Laudrup',
       number: '044-0451500',
-      id: 3
+      id: 4
     }
   ]
 
@@ -93,7 +101,7 @@ let persons = [
   app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     const note = persons.find(note => note.id === id)
-
+    console.log('note', note);
     if ( note ) {
       response.json(note)
     } else {
@@ -116,9 +124,6 @@ let persons = [
   })
 
 
-
-
-
   /*   */
   app.get('/info', (req, res) => {
     console.log('persons.length', persons.length);
@@ -130,40 +135,59 @@ let persons = [
   })
 
   
+  app.put('/api/persons/:id', (request, response) => {
+
+    console.log('app.put() request.body', request.body);
+    const body = request.body
+    const newNote = {
+      number: body.number,
+    }
+    if(persons.find(function(element) {
+      return body.name === element.name;
+    })){
+    persons = persons.map(function(person){
+      console.log('BACKEND app.put() body.name & body.number', body.name, body. number);
+
+      if(person.name === body.name) {
+        person.number = body.number
+      }
+      return person
+    })
+    console.log('BACKEND app.put() persons', persons);
+
+    response.json(newNote)
+   } else{
+    return response.status(400).json({error: 'Did not find person from database'})
+
+   }
+  })
+
+    
+
+  
   /*   */
   app.post('/api/persons', (request, response) => {
     const body = request.body
-  
-    /*
-    var filteredpersons = persons.filter(function (note) {
-      console.log("note.number: ",note.number,"typeof note.number: ", typeof note.number,"body.number: ", body.number,"typeof body.number: ", typeof body.number, note.number === body.number)
-
-      note.number != body.number
-
-    })
-*/
 
     if (body.number === "" || body.content === "" ) {
       return response.status(400).json({error: 'Person name or number missing'})
-    } else if (persons.filter(note => note.name === body.content).length != 0) {
+    } else if (persons.filter(note => note.name === body.name).length != 0) {
       return response.status(400).json({error: 'Name must must unique'})
     }
   
-    const note = {
-      name: body.content,
-      //important: body.important|| false,
-      //date: new Date(),
+    const newNote = {
+      name: body.name,
       number: body.number,
       id: generateId()
     }
   
-    persons = persons.concat(note)
-    response.json(note)
+    persons = persons.concat(newNote)
+    response.json(newNote)
   })
   
   const error = (request, response) => {
-    response.status(404).send({error: 'unknown endpoint'})
-  }
+  response.status(404).send({error: 'unknown endpoint'})
+}
   
 
   app.use(error)
