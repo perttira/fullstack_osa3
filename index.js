@@ -16,6 +16,9 @@ app.use(express.static('build'))
 // && 3.3 puhelinluettelon backend osa 3 && 3.4 puhelinluettelon backend osa 4
 // && 3.5 puhelinluettelon backend osa 5 && 3.6 puhelinluettelon backend osa 6
 // && 3.7 puhelinluettelon backend osa 7 && 3.8* puhelinluettelon backend osa 8
+// && 3.9 puhelinluettelon backend step9 && 3.10 puhelinluettelon backend step10
+// && 3.11 puhelinluettelo full stack
+
 
 
 const logger = (request, response, next) => {
