@@ -113,7 +113,7 @@ let persons = [
 
     Person.find({}).then(notes => {
       personsArray = notes.map(note => note.toJSON())
-      //console.log('allNotes', allNotes);
+      console.log('personsArray', personsArray);
       response.json(personsArray)
     });
 
@@ -163,12 +163,24 @@ let persons = [
 
     console.log('app.put() request.body', request.body);
     const body = request.body
-    const newNote = {
+
+    const person = new Person({
+      name: body.name,
       number: body.number,
-    }
-    if(persons.find(function(element) {
+    })
+
+    if(personsArray.find(function(element) {
       return body.name === element.name;
     })){
+      console.log('LÖYTY');
+   } else{
+    return response.status(400).json({error: 'Did not find person from database'})
+
+   }
+
+    /*
+  
+
     persons = persons.map(function(person){
       console.log('BACKEND app.put() body.name & body.number', body.name, body. number);
 
@@ -180,14 +192,11 @@ let persons = [
     console.log('BACKEND app.put() persons', persons);
 
     response.json(newNote)
-   } else{
-    return response.status(400).json({error: 'Did not find person from database'})
-
-   }
+*/
   })
 
-    
 
+  
   
   /*   */
   app.post('/api/persons', (request, response) => {
@@ -197,7 +206,6 @@ let persons = [
     const person = new Person({
       name: body.name,
       number: body.number,
-      //important: true,
     })
 
     if (body.name === "" || body.number === "") {
@@ -207,35 +215,18 @@ let persons = [
     }
 
     personsArray = personsArray.concat(person)
-    //console.log('app.post() /api/persons/ personsArray', personsArray)
 
     person.save(function(err, person) {
       response.json(person)
     })
   })
   
-  
+  // error-viesti jos urli ei sovi mihinkään routeen
   const error = (request, response) => {
     response.status(404).send({error: 'unknown endpoint'})
   }
   
-
   app.use(error)
-
-/*
-  const PORT = 3001
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-  })
-*/
-
-/*
-  const PORT = process.env.PORT || 3001
-  app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-  })
-
-  */
 
   const PORT = process.env.PORT
   app.listen(PORT, () => {
