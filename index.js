@@ -9,6 +9,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const Person = require('./models/note')
 
+var personsArray
 
 
 /*    3.1 puhelinluettelon backend osa 1 && 3.2 puhelinluettelon backend osa 2
@@ -109,13 +110,14 @@ let persons = [
 
   /*  */
   app.get('/api/persons', (request, response) => {
-    /*jos haluat palauttaa backendin "persons" -taulukon käytä tätä*/
-    //response.json(persons)
 
     Person.find({}).then(notes => {
-      console.log('notes', notes);
-      response.json(notes.map(note => note.toJSON()))
+      personsArray = notes.map(note => note.toJSON())
+      //console.log('allNotes', allNotes);
+      response.json(personsArray)
     });
+
+    //console.log('allPersons', allPersons);
     
   })
   
@@ -189,27 +191,33 @@ let persons = [
   
   /*   */
   app.post('/api/persons', (request, response) => {
+    
     const body = request.body
 
-    if (body.number === "" || body.content === "" ) {
-      return response.status(400).json({error: 'Person name or number missing'})
-    } else if (persons.filter(note => note.name === body.name).length != 0) {
-      return response.status(400).json({error: 'Name must must unique'})
-    }
-  
-    const newNote = {
+    const person = new Person({
       name: body.name,
       number: body.number,
-      id: generateId()
+      //important: true,
+    })
+
+    if (body.name === "" || body.number === "") {
+      return response.status(400).json({ error: 'content missing' })
+    } else if (personsArray.filter(note => note.name === body.name).length != 0) {
+      return response.status(400).json({error: 'Name must must unique'})
     }
-  
-    persons = persons.concat(newNote)
-    response.json(newNote)
+
+    personsArray = personsArray.concat(person)
+    //console.log('app.post() /api/persons/ personsArray', personsArray)
+
+    person.save(function(err, person) {
+      response.json(person)
+    })
   })
   
+  
   const error = (request, response) => {
-  response.status(404).send({error: 'unknown endpoint'})
-}
+    response.status(404).send({error: 'unknown endpoint'})
+  }
   
 
   app.use(error)
