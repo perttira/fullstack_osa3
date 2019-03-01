@@ -161,7 +161,6 @@ let persons = [
   
   app.put('/api/persons/:id', (request, response) => {
 
-    console.log('app.put() request.body', request.body);
     const body = request.body
 
     const person = new Person({
@@ -172,27 +171,29 @@ let persons = [
     if(personsArray.find(function(element) {
       return body.name === element.name;
     })){
+      personsArray = personsArray.map(function(person){
+        if(person.name === body.name) {
+          person.number = body.number
+        }
+        return person
+      })
+      //TODO 
+      console.log('Before findByIdAndUpdate');
+      console.log('request.params.id', request.params.id);
+      console.log('person', person);
+
+
+      Person.findByIdAndUpdate(request.params.id, { $set: { number: body.number }}, {new: true}, (err, person) => {
+          // Handle any possible database errors
+              if (err) return response.status(500).send(err);
+              return response.json(person);
+          })
+      
       console.log('LÖYTY');
    } else{
     return response.status(400).json({error: 'Did not find person from database'})
 
    }
-
-    /*
-  
-
-    persons = persons.map(function(person){
-      console.log('BACKEND app.put() body.name & body.number', body.name, body. number);
-
-      if(person.name === body.name) {
-        person.number = body.number
-      }
-      return person
-    })
-    console.log('BACKEND app.put() persons', persons);
-
-    response.json(newNote)
-*/
   })
 
 
