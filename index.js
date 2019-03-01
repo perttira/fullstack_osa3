@@ -11,9 +11,7 @@ const Person = require('./models/note')
 
 var personsArray
 // error-viesti jos urli ei sovi mihinkään routeen
-const error = (request, response) => {
-  response.status(404).send({error: 'unknown endpoint'})
-}
+
 
 
 /*    3.1 puhelinluettelon backend osa 1 && 3.2 puhelinluettelon backend osa 2
@@ -21,7 +19,10 @@ const error = (request, response) => {
 // && 3.5 puhelinluettelon backend osa 5 && 3.6 puhelinluettelon backend osa 6
 // && 3.7 puhelinluettelon backend osa 7 && 3.8* puhelinluettelon backend osa 8
 // && 3.9 puhelinluettelon backend step9 && 3.10 puhelinluettelon backend step10
-// && 3.11 puhelinluettelo full stack
+// && 3.11 puhelinluettelo full stack && 3.12: tietokanta komentoriviltä
+// && 3.13: puhelinluettelo ja tietokanta, step1 && 3.14: puhelinluettelo ja tietokanta, step2
+
+
 */
 
 app.use(cors())
@@ -29,7 +30,6 @@ app.use(cors())
 /* asetetaan backend käyttämään buildia. 
 Kommentoi pois jos haluat käyttää development versiota (esim osa2) */
 app.use(express.static('build'))
-app.use(error)
 
 
 //const password = process.argv[2]
@@ -217,6 +217,13 @@ let persons = [
       response.json(person)
     })
   })
+
+  const error = (request, response) => {
+    response.status(404).send({error: 'unknown endpoint'})
+  }
+
+  app.use(error)
+
     
 
   const PORT = process.env.PORT
