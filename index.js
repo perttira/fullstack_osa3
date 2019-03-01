@@ -10,6 +10,10 @@ const cors = require('cors')
 const Person = require('./models/note')
 
 var personsArray
+// error-viesti jos urli ei sovi mihinkään routeen
+const error = (request, response) => {
+  response.status(404).send({error: 'unknown endpoint'})
+}
 
 
 /*    3.1 puhelinluettelon backend osa 1 && 3.2 puhelinluettelon backend osa 2
@@ -25,6 +29,8 @@ app.use(cors())
 /* asetetaan backend käyttämään buildia. 
 Kommentoi pois jos haluat käyttää development versiota (esim osa2) */
 app.use(express.static('build'))
+app.use(error)
+
 
 //const password = process.argv[2]
 
@@ -163,11 +169,6 @@ let persons = [
 
     const body = request.body
 
-    const person = new Person({
-      name: body.name,
-      number: body.number,
-    })
-
     if(personsArray.find(function(element) {
       return body.name === element.name;
     })){
@@ -177,11 +178,6 @@ let persons = [
         }
         return person
       })
-      //TODO 
-      console.log('Before findByIdAndUpdate');
-      console.log('request.params.id', request.params.id);
-      console.log('person', person);
-
 
       Person.findByIdAndUpdate(request.params.id, { $set: { number: body.number }}, {new: true}, (err, person) => {
           // Handle any possible database errors
@@ -189,7 +185,6 @@ let persons = [
               return response.json(person);
           })
       
-      console.log('LÖYTY');
    } else{
     return response.status(400).json({error: 'Did not find person from database'})
 
@@ -210,7 +205,7 @@ let persons = [
     })
 
     if (body.name === "" || body.number === "") {
-      return response.status(400).json({ error: 'content missing' })
+      return response.status(400).json({ error: 'Content missing' })
     } else if (personsArray.filter(note => note.name === body.name).length != 0) {
       return response.status(400).json({error: 'Name must must unique'})
     }
@@ -218,16 +213,11 @@ let persons = [
     personsArray = personsArray.concat(person)
 
     person.save(function(err, person) {
+      if (err) return response.status(500).send(err);
       response.json(person)
     })
   })
-  
-  // error-viesti jos urli ei sovi mihinkään routeen
-  const error = (request, response) => {
-    response.status(404).send({error: 'unknown endpoint'})
-  }
-  
-  app.use(error)
+    
 
   const PORT = process.env.PORT
   app.listen(PORT, () => {
