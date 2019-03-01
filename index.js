@@ -129,25 +129,30 @@ let persons = [
   
   /*   */
   app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const note = persons.find(note => note.id === id)
-    console.log('note', note);
-    if ( note ) {
-      response.json(note)
-    } else {
-      response.status(404).end()
-    }
+    Person.findById(request.params.id)
+      .then(note => {
+        response.json(note.toJSON())
+      })
+      .catch(error => {
+        console.log(error);
+        response.status(404).end()
+      })
   })
 
   
   /*   */
   app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    
+        console.log('delete() /api/persons/ request.params.id', request.params.id)
     // id:tä ei löytynyt jos filter palauttaa tyhjän taulukon
-    if ( persons.filter(note => note.id === id).length != 0 ) {
-      persons = persons.filter(note => note.id !== id)
-      response.status(204).end()
+    personsArray.map(note => console.log('note.id', note.id))
+    if ( personsArray.filter(note => note.id == request.params.id).length != 0 ) {
+      personsArray = personsArray.filter(note => note.id != request.params.id)
+
+      Person.findByIdAndRemove(request.params.id, (err, person) => {
+        if (err) return res.status(500).send(err)
+        return response.json(person)
+    })
+
     } else {
       response.status(404).end()
     }
