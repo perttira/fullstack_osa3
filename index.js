@@ -21,6 +21,8 @@ var personsArray
 // && 3.9 puhelinluettelon backend step9 && 3.10 puhelinluettelon backend step10
 // && 3.11 puhelinluettelo full stack && 3.12: tietokanta komentoriviltä
 // && 3.13: puhelinluettelo ja tietokanta, step1 && 3.14: puhelinluettelo ja tietokanta, step2
+// 3.15: puhelinluettelo ja tietokanta, step3
+
 
 
 */
