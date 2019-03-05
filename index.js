@@ -2,6 +2,7 @@
 require('dotenv').config()
 
 const mongoose = require('mongoose')
+mongoose.set('useFindAndModify', false)
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
@@ -21,7 +22,9 @@ var personsArray
 // && 3.9 puhelinluettelon backend step9 && 3.10 puhelinluettelon backend step10
 // && 3.11 puhelinluettelo full stack && 3.12: tietokanta komentoriviltä
 // && 3.13: puhelinluettelo ja tietokanta, step1 && 3.14: puhelinluettelo ja tietokanta, step2
-// 3.15: puhelinluettelo ja tietokanta, step3
+// 3.15: puhelinluettelo ja tietokanta, step3 && 3.16: puhelinluettelo ja tietokanta, step3
+// 3.17*: puhelinluettelo ja tietokanta, step4 && 3.18*: puhelinluettelo ja tietokanta, step5
+
 
 
 
@@ -128,33 +131,37 @@ let persons = [
     //console.log('allPersons', allPersons);
     
   })
+
+
   
   /*   */
-  app.get('/api/persons/:id', (request, response) => {
+  app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
       .then(note => {
-        response.json(note.toJSON())
+        if (note) {
+          response.json(note.toJSON())
+        } else {
+          response.status(204).end()
+        }
       })
-      .catch(error => {
-        console.log(error);
-        response.status(404).end()
-      })
+      .catch(error => next(error))
   })
+
 
   
   /*   */
   app.delete('/api/persons/:id', (request, response) => {
-        console.log('delete() /api/persons/ request.params.id', request.params.id)
     // id:tä ei löytynyt jos filter palauttaa tyhjän taulukon
     personsArray.map(note => console.log('note.id', note.id))
+    
     if ( personsArray.filter(note => note.id == request.params.id).length != 0 ) {
       personsArray = personsArray.filter(note => note.id != request.params.id)
 
       Person.findByIdAndRemove(request.params.id, (err, person) => {
         if (err) return res.status(500).send(err)
-        return response.json(person)
-    })
-
+        return response.status(204).end()
+    }).catch(error => next(error))
+    
     } else {
       response.status(404).end()
     }
@@ -163,10 +170,8 @@ let persons = [
 
   /*   */
   app.get('/info', (req, res) => {
-    console.log('persons.length', persons.length);
-    //res.json(persons)
     var date = new Date()
-    res.write("<div>Puhelinluettelossa "+persons.length +" henkilon tiedot</div>")
+    res.write("<div>Puhelinluettelossa "+personsArray.length +" henkilon tiedot</div>")
     res.write("<div>"+date+"</div>")
     res.end()
   })
@@ -177,7 +182,7 @@ let persons = [
     const body = request.body
 
     if(personsArray.find(function(element) {
-      return body.name === element.name;
+      return request.params.id == element.id;
     })){
       personsArray = personsArray.map(function(person){
         if(person.name === body.name) {
@@ -187,15 +192,13 @@ let persons = [
       })
 
       Person.findByIdAndUpdate(request.params.id, { $set: { number: body.number }}, {new: true}, (err, person) => {
-          // Handle any possible database errors
               if (err) return response.status(500).send(err);
               return response.json(person);
-          })
+          }).catch(error => next(error))
       
-   } else{
-    return response.status(400).json({error: 'Did not find person from database'})
-
-   }
+    } else {   
+      return response.status(400).json({error: 'Did not find person from database'})
+    }
   })
 
 
@@ -229,7 +232,19 @@ let persons = [
     response.status(404).send({error: 'unknown endpoint'})
   }
 
+  const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+  
+    if (error.name === 'CastError' && error.kind == 'ObjectId') {
+      return response.status(400).send({ error: 'malformatted id' })
+    } 
+  
+    next(error)
+  }
+
   app.use(error)
+  app.use(errorHandler)
+
 
     
 
