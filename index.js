@@ -1,5 +1,7 @@
 //const http = require('http')
-require('dotenv').config()
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 
 const mongoose = require('mongoose')
 mongoose.set('useFindAndModify', false)
@@ -8,7 +10,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const cors = require('cors')
-const Person = require('./models/note')
+const Person = require('./models/person')
 
 var personsArray
 // error-viesti jos urli ei sovi mihinkään routeen
@@ -24,6 +26,8 @@ var personsArray
 // && 3.13: puhelinluettelo ja tietokanta, step1 && 3.14: puhelinluettelo ja tietokanta, step2
 // 3.15: puhelinluettelo ja tietokanta, step3 && 3.16: puhelinluettelo ja tietokanta, step3
 // 3.17*: puhelinluettelo ja tietokanta, step4 && 3.18*: puhelinluettelo ja tietokanta, step5
+// 3.19: puhelinluettelo ja tietokanta, step7
+
 
 
 
@@ -205,7 +209,7 @@ let persons = [
   
   
   /*   */
-  app.post('/api/persons', (request, response) => {
+  app.post('/api/persons', (request, response, next) => {
     
     const body = request.body
 
@@ -214,19 +218,14 @@ let persons = [
       number: body.number,
     })
 
-    if (body.name === "" || body.number === "") {
-      return response.status(400).json({ error: 'Content missing' })
-    } else if (personsArray.filter(note => note.name === body.name).length != 0) {
-      return response.status(400).json({error: 'Name must must unique'})
-    }
-
     personsArray = personsArray.concat(person)
 
-    person.save(function(err, person) {
-      if (err) return response.status(500).send(err);
+    person.save()
+    .then(persons => {
       response.json(person)
-    })
+    }).catch(error => next(error))
   })
+
 
   const error = (request, response) => {
     response.status(404).send({error: 'unknown endpoint'})
@@ -237,7 +236,9 @@ let persons = [
   
     if (error.name === 'CastError' && error.kind == 'ObjectId') {
       return response.status(400).send({ error: 'malformatted id' })
-    } 
+    } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
   
     next(error)
   }
