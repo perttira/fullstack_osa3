@@ -17,20 +17,18 @@ mongoose.connect(url, { useNewUrlParser: true })
   })
 
 const noteSchema = new mongoose.Schema({
-   // name: String,
-   // number: String,
+
     name: {
       type: String,
       unique: true,
-      required: true
+      required: true,
+      minlength: 3
     },
     number: { 
       type: String,
-      required: true
+      required: true,
+      minlength: 8
     }
-  //content: String,
-  //date: Date,
-  //important: Boolean,
 })
 
 noteSchema.set('toJSON', {
@@ -40,6 +38,7 @@ noteSchema.set('toJSON', {
     delete returnedObject.__v
   }
 })
+
 noteSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('Person', noteSchema)

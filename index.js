@@ -26,7 +26,8 @@ var personsArray
 // && 3.13: puhelinluettelo ja tietokanta, step1 && 3.14: puhelinluettelo ja tietokanta, step2
 // 3.15: puhelinluettelo ja tietokanta, step3 && 3.16: puhelinluettelo ja tietokanta, step3
 // 3.17*: puhelinluettelo ja tietokanta, step4 && 3.18*: puhelinluettelo ja tietokanta, step5
-// 3.19: puhelinluettelo ja tietokanta, step7
+// 3.19: puhelinluettelo ja tietokanta, step7 && 3.20*: puhelinluettelo ja tietokanta, step8
+
 
 
 
@@ -206,8 +207,6 @@ let persons = [
   })
 
 
-  
-  
   /*   */
   app.post('/api/persons', (request, response, next) => {
     
@@ -221,8 +220,8 @@ let persons = [
     personsArray = personsArray.concat(person)
 
     person.save()
-    .then(persons => {
-      response.json(person)
+    .then(note => {
+      response.json(note)
     }).catch(error => next(error))
   })
 
