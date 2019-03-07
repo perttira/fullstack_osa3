@@ -27,6 +27,7 @@ var personsArray
 // 3.15: puhelinluettelo ja tietokanta, step3 && 3.16: puhelinluettelo ja tietokanta, step3
 // 3.17*: puhelinluettelo ja tietokanta, step4 && 3.18*: puhelinluettelo ja tietokanta, step5
 // 3.19: puhelinluettelo ja tietokanta, step7 && 3.20*: puhelinluettelo ja tietokanta, step8
+// 3.21 tietokantaa käyttävä versio internettiin
 
 
 
